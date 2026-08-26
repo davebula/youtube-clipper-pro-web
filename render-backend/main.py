@@ -84,7 +84,7 @@ def process_job(job_id: str, request: ClipRequest):
                 with lock:
                     jobs[job_id]["progress"] = percent
         if process.wait() != 0 or not output.exists():
-            raise RuntimeError("The video could not be processed.")
+            raise RuntimeError(line.strip() if "line" in locals() else "yt-dlp failed without output.")
         with lock:
             jobs[job_id].update(status="completed", progress=100, message="Ready", download_url=f"/api/jobs/{job_id}/download", path=str(output), filename=f"{safe}.mp4")
     except Exception as exc:
