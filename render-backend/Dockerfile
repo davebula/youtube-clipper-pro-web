@@ -2,6 +2,7 @@ FROM node:22-bookworm-slim AS pot-builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
+    ca-certificates \
     python3 \
     make \
     g++ \
