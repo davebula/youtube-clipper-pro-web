@@ -13,7 +13,7 @@ export default function Home() {
   const [status,setStatus]=useState<"idle"|"working"|"ready"|"error">("idle"), [error,setError]=useState(""), [progress,setProgress]=useState(0), [download,setDownload]=useState("");
   const t=copy[language];
   useEffect(()=>{ document.documentElement.dataset.theme=theme; },[theme]);
-  useEffect(()=>{ fetch(`${API}/health`,{headers:{"X-Pinggy-No-Screen":"1"}}).then(r=>setOnline(r.ok)).catch(()=>setOnline(false)); },[]);
+  useEffect(()=>{ fetch(`${API}/health`,{headers:{"X-Pinggy-No-Screen":"AvoidTheProblem"}}).then(r=>setOnline(r.ok)).catch(()=>setOnline(false)); },[]);
   const statusText=useMemo(()=>online?t.connected:t.disconnected,[online,t]);
   async function submit(event:FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setDownload(""); const data=new FormData(event.currentTarget);
@@ -22,8 +22,8 @@ export default function Home() {
     if(a===null||b===null||b<=a){setError(t.errorTime);setStatus("error");return;}
     if(!online){setError(t.errorBackend);setStatus("error");return;}
     setStatus("working");setProgress(4);
-    try { const response=await fetch(`${API}/api/jobs`,{method:"POST",headers:{"Content-Type":"application/json","X-Pinggy-No-Screen":"1"},body:JSON.stringify(Object.fromEntries(data))}); if(!response.ok)throw new Error(); const {job_id}=await response.json();
-      const poll=window.setInterval(async()=>{try{const jr=await fetch(`${API}/api/jobs/${job_id}`,{headers:{"X-Pinggy-No-Screen":"1"}}), job:Job=await jr.json();setProgress(job.progress??8);if(job.status==="completed"){clearInterval(poll);setDownload(`${API}${job.download_url}`);setStatus("ready");setProgress(100);}else if(job.status==="failed"){clearInterval(poll);setError(job.message??t.errorBackend);setStatus("error");}}catch{clearInterval(poll);setError(t.errorBackend);setStatus("error");}},1800);
+    try { const response=await fetch(`${API}/api/jobs`,{method:"POST",headers:{"Content-Type":"application/json","X-Pinggy-No-Screen":"AvoidTheProblem"},body:JSON.stringify(Object.fromEntries(data))}); if(!response.ok)throw new Error(); const {job_id}=await response.json();
+      const poll=window.setInterval(async()=>{try{const jr=await fetch(`${API}/api/jobs/${job_id}`,{headers:{"X-Pinggy-No-Screen":"AvoidTheProblem"}}), job:Job=await jr.json();setProgress(job.progress??8);if(job.status==="completed"){clearInterval(poll);setDownload(`${API}${job.download_url}`);setStatus("ready");setProgress(100);}else if(job.status==="failed"){clearInterval(poll);setError(job.message??t.errorBackend);setStatus("error");}}catch{clearInterval(poll);setError(t.errorBackend);setStatus("error");}},1800);
     } catch { setError(t.errorBackend);setStatus("error"); }
   }
   return <main className="shell"><header className="topbar"><a className="brand" href="#top"><span className="mark">▶</span><span>Clipper <b>Pro</b></span></a><div className="actions"><button className="language" onClick={()=>setLanguage(language==="en"?"fr":"en")}>{language==="en"?"FR":"EN"}</button><button className="theme" onClick={()=>setTheme(theme==="dark"?"light":"dark")} aria-label="Change theme">{theme==="dark"?"☀":"☾"}</button></div></header>
